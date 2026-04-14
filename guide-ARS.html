@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide Utilisateur — ARS Simulateur Auto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #EB0017;
+    --red-dark: #C00010;
+    --red-soft: rgba(235,0,23,0.08);
+    --deep: #0A1628;
+    --navy: #0D2145;
+    --muted: #6B7A99;
+    --border: #E2E8F0;
+    --light: #F7F8FC;
+    --white: #FFFFFF;
+    --success: #1A7C5E;
+    --warn-bg: #FEF9EC;
+    --warn-border: #D4A017;
+    --sidebar-w: 270px;
+    --radius: 10px;
+    --shadow: 0 2px 20px rgba(10,22,40,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--deep);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 1000;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--red);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--deep);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    padding: 72px 48px 64px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 90% 50%, rgba(235,0,23,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 600px at -10% 80%, rgba(21,83,166,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(235,0,23,0.5), transparent);
+  }
+
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .hero-logo img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+  .hero-logo-fallback {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .hero-logo-fallback span { color: var(--red); }
+  .hero-logo-sep {
+    width: 1px;
+    height: 28px;
+    background: rgba(255,255,255,0.2);
+  }
+  .hero-logo-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    font-weight: 400;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.5vw, 44px);
+    font-weight: 500;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 14px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--red);
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    max-width: 460px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-red {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-red:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.07); color: white; }
+
+  .hero-stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 28px 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .hero-stat .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    color: var(--red);
+    display: block;
+    line-height: 1;
+  }
+  .hero-stat .lbl {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.45);
+    display: block;
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .hero-meta {
+    max-width: 1100px;
+    margin: 32px auto 0;
+    display: flex;
+    gap: 28px;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.38);
+  }
+  .hero-meta-item svg { flex-shrink: 0; }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 28px 0 40px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .sidebar-logo-wrap {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .sidebar-logo-img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .sidebar-logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--deep);
+  }
+  .sidebar-logo-text span { color: var(--red); }
+  .sidebar-tagline {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .nav-group-title {
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 20px 5px;
+    opacity: 0.65;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: #3A4A6B;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+  .nav-item:hover {
+    background: var(--light);
+    color: var(--red);
+    border-left-color: var(--red);
+  }
+  .nav-item.active {
+    background: var(--red-soft);
+    color: var(--red);
+    border-left-color: var(--red);
+    font-weight: 500;
+  }
+  .nav-icon {
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: currentColor; opacity: 0.75;
+  }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    padding: 52px 56px 80px;
+    min-width: 0;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 76px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--red-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--red);
+  }
+  .section-icon svg { width: 20px; height: 20px; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 500;
+    color: var(--deep); line-height: 1.2;
+  }
+  .section-subtitle {
+    font-size: 13.5px; color: var(--muted); margin-top: 4px;
+  }
+
+  /* ── CARDS 3-COL ── */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow); border-color: rgba(235,0,23,0.2); }
+  .card-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--red-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+  .card-icon svg { width: 18px; height: 18px; }
+  .card h3 { font-size: 14px; font-weight: 500; color: var(--deep); margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  /* ── NOTION CARDS ── */
+  .notion-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 20px 0 32px;
+  }
+  .notion-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--red);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 18px;
+  }
+  .notion-card.alt1 { border-top-color: #1A7C5E; }
+  .notion-card.alt2 { border-top-color: #1553A6; }
+  .notion-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .notion-card.alt1 .notion-label { color: #1A7C5E; }
+  .notion-card.alt2 .notion-label { color: #1553A6; }
+  .notion-label svg { width: 13px; height: 13px; }
+  .notion-card h4 { font-size: 14px; font-weight: 500; color: var(--deep); margin-bottom: 6px; }
+  .notion-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ── PROSE ── */
+  .prose { max-width: 700px; }
+  .prose p {
+    font-size: 15px; color: #2C3A55;
+    line-height: 1.75; margin-bottom: 16px;
+  }
+  .prose h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px; font-weight: 500;
+    color: var(--deep); margin: 32px 0 14px;
+  }
+
+  /* ── STEPS ── */
+  .steps { margin: 20px 0 28px; }
+  .step {
+    display: flex; gap: 14px;
+    margin-bottom: 14px; align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white; font-size: 12px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; color: var(--deep); margin-bottom: 2px; }
+  .step-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13.5px; margin: 14px 0 24px;
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(10,22,40,0.05);
+  }
+  .data-table thead th {
+    background: var(--deep);
+    color: rgba(255,255,255,0.7);
+    padding: 11px 16px; text-align: left;
+    font-size: 10.5px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .data-table tbody tr { border-bottom: 1px solid var(--border); }
+  .data-table tbody tr:last-child { border-bottom: none; }
+  .data-table tbody tr:hover { background: #FAFBFD; }
+  .data-table td { padding: 11px 16px; vertical-align: top; color: #2C3A55; }
+  .data-table td:first-child { font-weight: 500; color: var(--deep); }
+  .tag {
+    display: inline-block; font-size: 10.5px;
+    padding: 2px 9px; border-radius: 4px; font-weight: 500;
+  }
+  .tag.req { background: rgba(235,0,23,0.08); color: var(--red); }
+  .tag.opt { background: rgba(107,122,153,0.1); color: var(--muted); }
+
+  /* ── ALERT ── */
+  .alert {
+    border-radius: 8px; padding: 13px 16px;
+    margin: 14px 0; font-size: 13.5px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .alert-icon { flex-shrink: 0; margin-top: 1px; color: currentColor; }
+  .alert-icon svg { width: 16px; height: 16px; }
+  .alert.info { background: rgba(21,83,166,0.06); border-left: 3px solid #1553A6; color: #1553A6; }
+  .alert.warn { background: #FEF9EC; border-left: 3px solid #D4A017; color: #7A5A00; }
+  .alert.success { background: rgba(26,124,94,0.07); border-left: 3px solid #1A7C5E; color: #0D4A35; }
+  .alert.danger { background: rgba(235,0,23,0.06); border-left: 3px solid var(--red); color: #8B0010; }
+
+  /* ── FORMULA CARDS ── */
+  .formula-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin: 20px 0;
+  }
+  .formula-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 18px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .formula-card:hover { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-soft); }
+  .formula-badge {
+    display: inline-block; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .formula-card.std .formula-badge { background: rgba(107,122,153,0.1); color: var(--muted); }
+  .formula-card.dc .formula-badge { background: rgba(21,83,166,0.1); color: #1553A6; }
+  .formula-card.tr .formula-badge { background: rgba(26,124,94,0.1); color: #1A7C5E; }
+  .formula-card h4 { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--deep); }
+  .formula-card p { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+  /* ── STATUS PILLS ── */
+  .status-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0 24px; }
+  .status-item {
+    display: flex; align-items: center; gap: 14px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+  }
+  .pill {
+    font-size: 11px; font-weight: 500;
+    padding: 4px 12px; border-radius: 20px;
+    min-width: 90px; text-align: center; flex-shrink: 0;
+  }
+  .pill.grey { background: #EEF0F5; color: #5C6885; }
+  .pill.blue { background: rgba(21,83,166,0.1); color: #1553A6; }
+  .pill.green { background: rgba(26,124,94,0.1); color: #1A7C5E; }
+  .pill.red { background: var(--red-soft); color: var(--red); }
+  .pill.orange { background: rgba(181,105,26,0.1); color: #8A5A00; }
+  .status-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── WORKFLOW DIAGRAM ── */
+  .workflow-box {
+    background: white; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px;
+    margin: 20px 0;
+  }
+  .workflow-title {
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .workflow-title svg { color: var(--red); }
+  .wf-steps { display: flex; flex-direction: column; gap: 0; }
+  .wf-step { display: flex; gap: 16px; padding-bottom: 18px; }
+  .wf-step:last-child { padding-bottom: 0; }
+  .wf-col { display: flex; flex-direction: column; align-items: center; width: 22px; flex-shrink: 0; }
+  .wf-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%; background: var(--red);
+    flex-shrink: 0; margin-top: 3px;
+    box-shadow: 0 0 0 3px var(--red-soft);
+  }
+  .wf-line { width: 2px; flex: 1; background: var(--border); margin-top: 6px; }
+  .wf-step:last-child .wf-line { display: none; }
+  .wf-body { flex: 1; }
+  .wf-step-title { font-size: 14px; font-weight: 500; color: var(--deep); margin-bottom: 2px; }
+  .wf-step-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── JOURNEY DIAGRAM ── */
+  .journey-wrap {
+    background: white; border: 1px solid var(--border);
+    border-radius: 14px; padding: 32px 28px;
+    margin: 28px 0 8px;
+    overflow-x: auto;
+  }
+  .journey-title {
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 28px;
+  }
+  .journey {
+    display: flex; align-items: center;
+    gap: 0; min-width: 600px;
+  }
+  .journey-step {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; position: relative;
+  }
+  .journey-step::after {
+    content: '';
+    position: absolute;
+    top: 22px; left: 55%;
+    width: 90%; height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .journey-step:last-child::after { display: none; }
+  .journey-node {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--light);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); position: relative; z-index: 1;
+    transition: all 0.3s;
+  }
+  .journey-node svg { width: 18px; height: 18px; }
+  .journey-step.done .journey-node {
+    background: var(--red-soft);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .journey-step.done::after { background: var(--red); opacity: 0.2; }
+  .journey-label {
+    font-size: 11.5px; font-weight: 500; color: var(--muted);
+    text-align: center; margin-top: 10px; max-width: 80px;
+    line-height: 1.3;
+  }
+  .journey-step.done .journey-label { color: var(--red); }
+  .journey-step-num {
+    font-size: 9px; font-weight: 500;
+    background: var(--red); color: white;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: -4px; right: 30%;
+    z-index: 2;
+  }
+  .journey-step:not(.done) .journey-step-num {
+    background: var(--muted);
+  }
+
+  /* ── FAQ ── */
+  .faq { margin: 8px 0; }
+  .faq-item {
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px; overflow: hidden;
+  }
+  .faq-q {
+    padding: 15px 20px;
+    font-size: 14px; font-weight: 500; color: var(--deep);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    user-select: none; transition: background 0.15s;
+  }
+  .faq-q:hover { background: var(--light); }
+  .faq-chevron {
+    flex-shrink: 0; color: var(--muted);
+    transition: transform 0.25s; width: 16px; height: 16px;
+  }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--red); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .faq-item.open .faq-a { max-height: 400px; }
+  .faq-a-inner {
+    padding: 14px 20px 16px;
+    font-size: 13.5px; color: var(--muted);
+    line-height: 1.65;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── TIPS GRID ── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px; margin: 20px 0;
+  }
+  .tip-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px;
+    display: flex; gap: 14px;
+    transition: border-color 0.2s;
+  }
+  .tip-card:hover { border-color: rgba(235,0,23,0.2); }
+  .tip-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: var(--red-soft); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red); margin-top: 1px;
+  }
+  .tip-icon svg { width: 16px; height: 16px; }
+  .tip-body h4 { font-size: 13.5px; font-weight: 500; color: var(--deep); margin-bottom: 4px; }
+  .tip-body p { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  /* ── DELIVERY GRID ── */
+  .delivery-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 14px; margin: 16px 0 24px;
+  }
+  .delivery-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+    transition: border-color 0.2s;
+  }
+  .delivery-card.featured {
+    border-color: #1A7C5E;
+    background: rgba(26,124,94,0.03);
+  }
+  .delivery-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .delivery-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px; display: flex;
+    align-items: center; justify-content: center;
+    background: var(--light); color: var(--muted);
+  }
+  .delivery-icon svg { width: 16px; height: 16px; }
+  .delivery-card.featured .delivery-icon { background: rgba(26,124,94,0.1); color: #1A7C5E; }
+  .delivery-card h4 { font-size: 14px; font-weight: 500; color: var(--deep); }
+  .delivery-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; color: var(--red);
+    margin-bottom: 6px;
+  }
+  .delivery-card.featured .delivery-price { color: #1A7C5E; }
+  .delivery-card p { font-size: 12.5px; color: var(--muted); }
+
+  /* ── FOOTER ── */
+  .content-footer {
+    margin-top: 72px; padding-top: 28px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  }
+  .footer-logo { display: flex; align-items: center; gap: 10px; }
+  .footer-logo-img { height: 28px; width: auto; object-fit: contain; }
+  .footer-text { font-family: 'Playfair Display', serif; font-size: 13.5px; font-weight: 500; color: var(--deep); }
+  .footer-text span { color: var(--red); }
+  .footer-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── MOBILE MENU BUTTON ── */
+  .mobile-nav-btn {
+    display: none;
+    position: fixed;
+    bottom: 24px; right: 24px;
+    width: 48px; height: 48px;
+    background: var(--red); color: white;
+    border: none; border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(235,0,23,0.35);
+    cursor: pointer; z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .mobile-nav-btn svg { width: 20px; height: 20px; }
+  .mobile-sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 150; opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .mobile-sidebar-overlay.open { opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed; left: -280px; top: 0;
+      width: 270px; height: 100vh;
+      z-index: 160; transition: left 0.3s ease;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    }
+    .sidebar.open { left: 0; }
+    .mobile-nav-btn { display: flex; }
+    .mobile-sidebar-overlay { display: block; }
+    .content { padding: 40px 20px 60px; }
+    .hero { padding: 52px 20px 44px; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-stat { display: none; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .notion-row { grid-template-columns: 1fr; }
+    .formula-grid { grid-template-columns: 1fr; }
+    .tips-grid { grid-template-columns: 1fr; }
+    .delivery-grid { grid-template-columns: 1fr; }
+    .journey-wrap { padding: 24px 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 26px; }
+    .section-title { font-size: 22px; }
+    .content { padding: 32px 16px 60px; }
+    .data-table { font-size: 12.5px; }
+    .data-table td, .data-table th { padding: 9px 12px; }
+  }
+
+  @media print {
+    .sidebar, .mobile-nav-btn, .progress-bar-wrap { display: none !important; }
+    .layout { display: block; }
+    .content { padding: 24px; }
+    .section { opacity: 1 !important; transform: none !important; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap"><div class="progress-bar" id="progress"></div></div>
+
+<!-- MOBILE NAV BUTTON -->
+<button class="mobile-nav-btn" id="mobileBtn" aria-label="Menu" onclick="toggleMobileSidebar()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<div class="mobile-sidebar-overlay" id="overlay" onclick="toggleMobileSidebar()"></div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-logo">
+        <img src="logo/Image1.png"
+             onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex';"
+             alt="ARS Logo" class="hero-logo-img" style="height:48px;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
+        <div id="logo-fallback" class="hero-logo-fallback" style="display:none;">ARS<span>.</span></div>
+        <div class="hero-logo-sep"></div>
+        <div class="hero-logo-label">Courtage & Assurance</div>
+      </div>
+      <h1>Guide <em>Utilisateur</em><br>Simulateur Auto</h1>
+      <p class="hero-sub">Créez vos simulations, obtenez vos devis, soumettez votre dossier et souscrivez votre assurance automobile — entièrement en ligne.</p>
+      <div class="hero-actions">
+        <a href="#" onclick="downloadGuide(event)" class="btn-red">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger le guide
+        </a>
+        <a href="#introduction" class="btn-ghost" onclick="closeMobileSidebar()">Lire en ligne
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="hero-stat">
+      <span class="num">14</span>
+      <span class="lbl">Sections</span>
+    </div>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Version 1.0 — 2025
+    </div>
+    <div class="hero-meta-item">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+      Tous appareils
+    </div>
+    <div class="hero-meta-item">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Paiement sécurisé Flouci
+    </div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo-wrap">
+      <img src="logo/Image1.png"
+           onerror="this.style.display='none';document.getElementById('sidebar-logo-fallback').style.display='block';"
+           alt="ARS Logo" class="sidebar-logo-img">
+      <div id="sidebar-logo-fallback" style="display:none;">
+        <div class="sidebar-logo-text">ARS<span>.</span>Auto</div>
+      </div>
+      <div class="sidebar-tagline">Guide Utilisateur v1.0</div>
+    </div>
+    <nav>
+      <div class="nav-group-title">Démarrage</div>
+      <a class="nav-item" onclick="navTo('introduction')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        Introduction
+      </a>
+      <a class="nav-item" onclick="navTo('acces')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+        Accès à la plateforme
+      </a>
+      <a class="nav-item" onclick="navTo('dashboard')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+        Tableau de bord
+      </a>
+
+      <div class="nav-group-title">Parcours client</div>
+      <a class="nav-item" onclick="navTo('simulation')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+        Créer une simulation
+      </a>
+      <a class="nav-item" onclick="navTo('couverture')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        Choisir la couverture
+      </a>
+      <a class="nav-item" onclick="navTo('devis')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+        Générer les devis
+      </a>
+      <a class="nav-item" onclick="navTo('documents')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></span>
+        Pièces justificatives
+      </a>
+      <a class="nav-item" onclick="navTo('soumission')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span>
+        Soumettre le dossier
+      </a>
+      <a class="nav-item" onclick="navTo('achat')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+        Acheter un devis
+      </a>
+      <a class="nav-item" onclick="navTo('contrats')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 12 18 15 15"/><line x1="12" y1="12" x2="12" y2="18"/></svg></span>
+        Mes contrats
+      </a>
+
+      <div class="nav-group-title">Aide</div>
+      <a class="nav-item" onclick="navTo('notifications')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
+        Notifications
+      </a>
+      <a class="nav-item" onclick="navTo('bonnes-pratiques')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        Bonnes pratiques
+      </a>
+      <a class="nav-item" onclick="navTo('faq')">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        FAQ
+        <span class="nav-badge">13</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- INTRODUCTION -->
+    <section class="section" id="introduction">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Introduction</div>
+          <div class="section-subtitle">Présentation de la plateforme et concepts essentiels</div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>Le simulateur de tarification automobile d'ARS vous permet d'obtenir des devis en quelques minutes, de comparer les offres et de transformer votre devis en contrat — entièrement en ligne, depuis n'importe quel appareil.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>Rapide</h3>
+          <p>Un devis en quelques minutes, sans rendez-vous ni paperasse.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <h3>Sécurisé</h3>
+          <p>Paiement en ligne via Flouci, hébergement conforme aux standards de sécurité.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          </div>
+          <h3>Responsive</h3>
+          <p>Accessible depuis votre ordinateur, tablette ou smartphone.</p>
+        </div>
+      </div>
+
+      <!-- JOURNEY DIAGRAM -->
+      <div class="journey-wrap">
+        <div class="journey-title">Votre parcours en 5 étapes</div>
+        <div class="journey">
+          <div class="journey-step done">
+            <div class="journey-step-num">1</div>
+            <div class="journey-node">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div class="journey-label">Simulation</div>
+          </div>
+          <div class="journey-step done">
+            <div class="journey-step-num">2</div>
+            <div class="journey-node">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="journey-label">Couverture</div>
+          </div>
+          <div class="journey-step done">
+            <div class="journey-step-num">3</div>
+            <div class="journey-node">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="journey-label">Devis généré</div>
+          </div>
+          <div class="journey-step done">
+            <div class="journey-step-num">4</div>
+            <div class="journey-node">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </div>
+            <div class="journey-label">Soumission ARS</div>
+          </div>
+          <div class="journey-step done">
+            <div class="journey-step-num">5</div>
+            <div class="journey-node">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="journey-label">Contrat actif</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:28px 0 14px;">Les trois notions essentielles</h3>
+      <div class="notion-row">
+        <div class="notion-card">
+          <div class="notion-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Simulation
+          </div>
+          <h4>Votre point de départ</h4>
+          <p>Brouillon contenant les informations du véhicule, la formule et les garanties souhaitées.</p>
+        </div>
+        <div class="notion-card alt1">
+          <div class="notion-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            Devis
+          </div>
+          <h4>Proposition chiffrée</h4>
+          <p>Calculé automatiquement par la compagnie d'assurance sur la base de votre simulation.</p>
+        </div>
+        <div class="notion-card alt2">
+          <div class="notion-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Contrat
+          </div>
+          <h4>Document officiel</h4>
+          <p>Actif après validation par ARS et paiement de votre prime d'assurance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCÈS -->
+    <section class="section" id="acces">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Accès à la plateforme</div>
+          <div class="section-subtitle">Créer votre compte, vous connecter et naviguer</div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin-bottom:16px;">Créer votre compte</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Accéder à la page d'inscription</div><div class="step-desc">Rendez-vous sur la page d'inscription de la plateforme ARS.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Renseigner vos informations</div><div class="step-desc">Saisissez vos informations personnelles, votre e-mail et choisissez un mot de passe sécurisé.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Code organisation (si applicable)</div><div class="step-desc">Si vous êtes rattaché à une organisation partenaire, saisissez le code organisation et la clé d'accès fournis par votre employeur.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Activer votre compte</div><div class="step-desc">Saisissez le code de vérification reçu par e-mail pour activer votre accès.</div></div></div>
+      </div>
+
+      <div class="alert warn">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </span>
+        <div>Si vous dépendez d'une organisation partenaire, renseignez votre code d'accès <strong>dès l'inscription</strong> pour bénéficier des conventions et réductions associées.</div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:28px 0 14px;">Navigation principale</h3>
+      <table class="data-table">
+        <thead><tr><th>Section</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Tableau de bord</td><td>Vue d'ensemble de votre activité</td></tr>
+          <tr><td>Nouvelle simulation</td><td>Créer une nouvelle demande de devis</td></tr>
+          <tr><td>Mes simulations</td><td>Historique et gestion de vos simulations</td></tr>
+          <tr><td>Mes devis</td><td>Liste de tous vos devis générés</td></tr>
+          <tr><td>Mes contrats</td><td>Vos contrats actifs et archivés</td></tr>
+          <tr><td>Mes documents</td><td>Gestion de vos pièces justificatives</td></tr>
+          <tr><td>Notifications</td><td>Alertes et mises à jour de votre dossier</td></tr>
+          <tr><td>Paramètres</td><td>Configuration de votre compte</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- TABLEAU DE BORD -->
+    <section class="section" id="dashboard">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Tableau de bord</div>
+          <div class="section-subtitle">Vue synthétique de votre activité</div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>C'est votre page d'accueil après connexion. Vous y retrouvez d'un coup d'œil : simulations en brouillon, demandes en attente, devis validés prêts à l'achat, et vos dernières actions.</p>
+      </div>
+
+      <table class="data-table">
+        <thead><tr><th>Indicateur</th><th>Signification</th></tr></thead>
+        <tbody>
+          <tr><td>Simulation en brouillon</td><td>Vous avez démarré une demande sans la finaliser</td></tr>
+          <tr><td>Devis en attente</td><td>Votre dossier est en cours d'examen par ARS</td></tr>
+          <tr><td>Devis validé</td><td>Approuvé — vous pouvez procéder à l'achat</td></tr>
+          <tr><td>Contrat actif</td><td>Votre assurance est en cours de validité</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SIMULATION -->
+    <section class="section" id="simulation">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Créer une simulation</div>
+          <div class="section-subtitle">Saisir les informations de votre véhicule et votre profil d'assuré</div>
+        </div>
+      </div>
+
+      <div class="alert info">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </span>
+        <div><strong>Préparez à l'avance :</strong> immatriculation, puissance fiscale (CV), nombre de places, date de première circulation, valeur à neuf, valeur vénale, classe bonus-malus et type d'usage.</div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:24px 0 14px;">Informations du véhicule</h3>
+      <table class="data-table">
+        <thead><tr><th>Champ</th><th>Description</th><th>Statut</th></tr></thead>
+        <tbody>
+          <tr><td>Immatriculation</td><td>Numéro de plaque</td><td><span class="tag opt">Facultatif</span></td></tr>
+          <tr><td>Puissance fiscale</td><td>Exprimée en CV</td><td><span class="tag req">Obligatoire</span></td></tr>
+          <tr><td>Nombre de places</td><td>Capacité totale du véhicule</td><td><span class="tag req">Obligatoire</span></td></tr>
+          <tr><td>Date de première circulation</td><td>Date de mise en service</td><td><span class="tag req">Obligatoire</span></td></tr>
+          <tr><td>Valeur à neuf</td><td>Prix d'achat neuf (en DT)</td><td><span class="tag req">Obligatoire</span></td></tr>
+          <tr><td>Valeur vénale</td><td>Valeur actuelle estimée (en DT)</td><td><span class="tag req">Obligatoire</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="alert warn">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </span>
+        <div>La <strong>valeur à neuf</strong> doit toujours être supérieure ou égale à la valeur vénale. La date de première circulation ne peut pas être dans le futur.</div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:24px 0 14px;">Profil d'assuré</h3>
+      <div class="prose">
+        <p>Sélectionnez votre <strong>classe bonus-malus</strong> et le <strong>type d'usage</strong> du véhicule. Ces deux informations influencent directement le calcul de votre prime d'assurance. Un usage professionnel non déclaré peut entraîner un refus de prise en charge en cas de sinistre.</p>
+      </div>
+    </section>
+
+    <!-- COUVERTURE -->
+    <section class="section" id="couverture">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Choisir la couverture</div>
+          <div class="section-subtitle">Formule, compagnies et garanties optionnelles</div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin-bottom:16px;">Formules disponibles</h3>
+      <div class="formula-grid">
+        <div class="formula-card std">
+          <span class="formula-badge">Standard</span>
+          <h4>Couverture de base</h4>
+          <p>Responsabilité civile et garanties essentielles. Idéal pour les véhicules anciens ou un budget limité.</p>
+        </div>
+        <div class="formula-card dc">
+          <span class="formula-badge">Dommages Collision</span>
+          <h4>Protection étendue</h4>
+          <p>Inclut les dommages lors d'une collision avec un tiers identifié. Requiert un capital par compagnie.</p>
+        </div>
+        <div class="formula-card tr">
+          <span class="formula-badge">Tous Risques</span>
+          <h4>Couverture maximale</h4>
+          <p>Tous les dommages couverts, quelle qu'en soit la cause. Recommandé pour les véhicules récents.</p>
+        </div>
+      </div>
+
+      <div class="alert info">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </span>
+        <div>Vous pouvez comparer jusqu'à <strong>2 compagnies</strong> simultanément. Certaines formules peuvent être indisponibles selon l'âge du véhicule ou son usage — un message explicatif s'affiche.</div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:28px 0 14px;">Paramètres complémentaires</h3>
+      <table class="data-table">
+        <thead><tr><th>Paramètre</th><th>Applicable à</th></tr></thead>
+        <tbody>
+          <tr><td>Taux de franchise</td><td>Formule Tous Risques</td></tr>
+          <tr><td>Limite Bris de Glaces</td><td>Garantie Bris de Glaces optionnelle</td></tr>
+          <tr><td>Capital Dommages Collision</td><td>Par compagnie (formule DC)</td></tr>
+          <tr><td>Capital Assurance Conducteur</td><td>Par compagnie sélectionnée</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- DEVIS -->
+    <section class="section" id="devis">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Générer et consulter les devis</div>
+          <div class="section-subtitle">Calcul automatique, comparaison et téléchargement PDF</div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>Une fois votre simulation complétée, cliquez sur <strong>« Générer les devis »</strong>. La plateforme calcule automatiquement un devis pour chaque compagnie sélectionnée, en appliquant les barèmes et conventions en vigueur.</p>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:24px 0 14px;">Statuts d'un devis</h3>
+      <div class="status-list">
+        <div class="status-item"><span class="pill grey">Généré</span><span class="status-desc">Calculé mais pas encore soumis à ARS.</span></div>
+        <div class="status-item"><span class="pill blue">Soumis</span><span class="status-desc">Dossier en cours d'examen par l'équipe ARS.</span></div>
+        <div class="status-item"><span class="pill green">Validé</span><span class="status-desc">Approuvé — vous pouvez procéder au paiement.</span></div>
+        <div class="status-item"><span class="pill red">Rejeté</span><span class="status-desc">Non retenu. Consultez le motif affiché pour corriger.</span></div>
+        <div class="status-item"><span class="pill orange">Transformé</span><span class="status-desc">Ce devis a déjà donné lieu à un contrat actif.</span></div>
+      </div>
+
+      <div class="alert success">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        <div>Vous pouvez <strong>télécharger votre devis en PDF</strong> à tout moment et <strong>comparer deux devis côte à côte</strong> depuis la section « Mes devis ».</div>
+      </div>
+    </section>
+
+    <!-- DOCUMENTS -->
+    <section class="section" id="documents">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Pièces justificatives</div>
+          <div class="section-subtitle">Documents obligatoires et complémentaires</div>
+        </div>
+      </div>
+
+      <div class="alert danger">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </span>
+        <div><strong>Documents obligatoires :</strong> Carte grise + Carte d'identité nationale (CIN). Sans ces deux documents, vous ne pouvez pas soumettre votre dossier.</div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:24px 0 14px;">Documents complémentaires</h3>
+      <table class="data-table">
+        <thead><tr><th>Document</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td>Permis de conduire</td><td>Vérification du conducteur principal</td></tr>
+          <tr><td>Visite technique</td><td>Conformité du véhicule</td></tr>
+          <tr><td>Vignette</td><td>Justificatif fiscal du véhicule</td></tr>
+          <tr><td>RNE</td><td>Dossiers professionnels / entreprises</td></tr>
+        </tbody>
+      </table>
+
+      <div class="alert info">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </span>
+        <div>Vos documents sont rattachés à votre compte et réutilisables pour vos futures demandes. Un nouveau fichier déposé remplace automatiquement l'ancien.</div>
+      </div>
+    </section>
+
+    <!-- SOUMISSION -->
+    <section class="section" id="soumission">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Soumettre le dossier à ARS</div>
+          <div class="section-subtitle">Processus de validation par l'équipe ARS</div>
+        </div>
+      </div>
+
+      <div class="workflow-box">
+        <div class="workflow-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Processus de soumission
+        </div>
+        <div class="wf-steps">
+          <div class="wf-step">
+            <div class="wf-col"><div class="wf-dot"></div><div class="wf-line"></div></div>
+            <div class="wf-body"><div class="wf-step-title">Vérifier les documents</div><div class="wf-step-desc">Assurez-vous que carte grise et CIN sont bien déposés.</div></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-col"><div class="wf-dot"></div><div class="wf-line"></div></div>
+            <div class="wf-body"><div class="wf-step-title">Cliquer sur « Confirmer et soumettre »</div><div class="wf-step-desc">Le statut passe à « Soumis » et ARS est automatiquement notifié.</div></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-col"><div class="wf-dot"></div><div class="wf-line"></div></div>
+            <div class="wf-body"><div class="wf-step-title">Examen par l'équipe ARS</div><div class="wf-step-desc">Vérification des pièces et de la conformité du dossier.</div></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-col"><div class="wf-dot"></div></div>
+            <div class="wf-body"><div class="wf-step-title">Validation ou retour</div><div class="wf-step-desc">Devis validé (passage au paiement) ou rejeté avec un motif explicatif.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHAT -->
+    <section class="section" id="achat">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Acheter un devis validé</div>
+          <div class="section-subtitle">Date d'effet, livraison et paiement en ligne</div>
+        </div>
+      </div>
+
+      <div class="alert warn">
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </span>
+        <div><strong>Important :</strong> Un seul devis par simulation peut être transformé en contrat. Une fois l'achat effectué, les autres devis de la même simulation ne sont plus disponibles.</div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:24px 0 16px;">Mode de livraison</h3>
+      <div class="delivery-grid">
+        <div class="delivery-card featured">
+          <div class="delivery-head">
+            <div class="delivery-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <h4>Retrait en agence</h4>
+          </div>
+          <div class="delivery-price">Gratuit</div>
+          <p>Récupérez votre contrat directement dans l'agence ARS la plus proche.</p>
+        </div>
+        <div class="delivery-card">
+          <div class="delivery-head">
+            <div class="delivery-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <h4>Livraison à domicile</h4>
+          </div>
+          <div class="delivery-price">+10 DT</div>
+          <p>Livré à l'adresse de votre choix. Renseignez une adresse complète et précise.</p>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--deep);margin:24px 0 14px;">Étapes du processus d'achat</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Choisir la date d'effet</div><div class="step-desc">Date de début de couverture. La plateforme propose automatiquement la première date disponible. Après 16h00 ou le week-end, certaines dates peuvent être bloquées.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Choisir le mode de livraison</div><div class="step-desc">Retrait en agence (gratuit) ou livraison à domicile (+10 DT).</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Renseigner l'adresse (si livraison)</div><div class="step-desc">Gouvernorat, délégation, localité, code postal, téléphone et e-mail.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Accepter les conditions</div><div class="step-desc">Confirmez l'exactitude de toutes les informations fournies.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Payer via Flouci</div><div class="step-desc">Paiement sécurisé en ligne. Le contrat est émis et actif immédiatement après confirmation.</div></div></div>
+      </div>
+    </section>
+
+    <!-- CONTRATS -->
+    <section class="section" id="contrats">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 12 18 15 15"/><line x1="12" y1="12" x2="12" y2="18"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Mes contrats</div>
+          <div class="section-subtitle">Consulter, télécharger et suivre vos contrats</div>
+        </div>
+      </div>
+
+      <div class="status-list">
+        <div class="status-item"><span class="pill green">Actif</span><span class="status-desc">Votre assurance est en cours de validité.</span></div>
+        <div class="status-item"><span class="pill orange">Suspendu</span><span class="status-desc">Le contrat est temporairement inactif.</span></div>
+        <div class="status-item"><span class="pill red">Annulé</span><span class="status-desc">Le contrat a été résilié.</span></div>
+        <div class="status-item"><span class="pill grey">Expiré</span><span class="status-desc">La période de couverture est terminée.</span></div>
+      </div>
+
+      <div class="prose">
+        <p>Depuis le détail d'un contrat, vous pouvez télécharger le PDF, consulter les documents associés et accéder à la quittance de paiement.</p>
+      </div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section class="section" id="notifications">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Notifications et suivi</div>
+          <div class="section-subtitle">Être alerté à chaque étape de votre dossier</div>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead><tr><th>Événement</th><th>Type de notification</th></tr></thead>
+        <tbody>
+          <tr><td>Simulation créée</td><td>Confirmation de création</td></tr>
+          <tr><td>Devis généré</td><td>Confirmation de génération</td></tr>
+          <tr><td>Devis soumis</td><td>Accusé de réception ARS</td></tr>
+          <tr><td>Devis validé</td><td>Invitation à procéder au paiement</td></tr>
+          <tr><td>Devis rejeté</td><td>Motif de rejet et recommandations</td></tr>
+          <tr><td>Documents demandés</td><td>Demande de pièces complémentaires</td></tr>
+          <tr><td>Contrat créé</td><td>Confirmation d'émission du contrat</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- BONNES PRATIQUES -->
+    <section class="section" id="bonnes-pratiques">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Bonnes pratiques</div>
+          <div class="section-subtitle">Conseils pour un parcours rapide et sans erreur</div>
+        </div>
+      </div>
+
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="tip-body"><h4>Préparez vos documents</h4><p>Carte grise et CIN prêts à l'avance pour éviter les allers-retours lors de la soumission.</p></div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <div class="tip-body"><h4>Vérifiez les valeurs</h4><p>Contrôlez valeur à neuf et valeur vénale avant de lancer — une erreur fausse le calcul de la prime.</p></div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="tip-body"><h4>Comparez équitablement</h4><p>Pour comparer deux compagnies, gardez exactement la même configuration dans les deux cas.</p></div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div class="tip-body"><h4>Lisez les commentaires</h4><p>En cas de rejet, lisez attentivement le motif — il contient les instructions de correction.</p></div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="tip-body"><h4>Agissez vite après validation</h4><p>Ne tardez pas à acheter un devis validé — les conditions tarifaires peuvent évoluer.</p></div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="tip-body"><h4>Adresse de livraison précise</h4><p>Si vous choisissez la livraison à domicile, renseignez une adresse complète et exacte.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Questions fréquentes</div>
+          <div class="section-subtitle">Réponses aux problèmes les plus courants</div>
+        </div>
+      </div>
+
+      <div class="faq">
+        <div class="faq-item">
+          <div class="faq-q">Je ne vois aucune convention. Est-ce normal ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Oui. Si votre compte n'est rattaché à aucune organisation partenaire, les devis sont générés sans réduction conventionnelle. Si vous pensez bénéficier d'une convention, contactez votre gestionnaire ARS.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Une formule est grisée ou indisponible. Pourquoi ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Certaines formules ne sont pas accessibles selon l'âge du véhicule, le type d'usage ou les règles de la compagnie. Un message explicatif s'affiche pour vous guider.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Je ne peux pas continuer après avoir sélectionné Dommages Collision.
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Vérifiez que vous avez bien renseigné un capital Dommages Collision pour chaque compagnie sélectionnée. Ce champ est obligatoire pour générer un devis avec cette formule.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Pourquoi certaines garanties n'apparaissent-elles pas ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">La garantie peut être déjà incluse automatiquement dans votre formule, masquée car indisponible pour la compagnie choisie, ou regroupée avec une autre garantie.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">La garantie Bris de Glaces apparaît comme gratuite. Est-ce une erreur ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Non. Dans certaines configurations (formule, compagnie, convention), cette garantie peut être incluse sans surcoût. La plateforme vous l'indique clairement.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Je ne peux pas soumettre mon devis.
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Le cas le plus fréquent est l'absence des documents obligatoires : carte grise et CIN. Rendez-vous dans « Mes documents » pour les déposer, puis revenez soumettre votre dossier.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Mon devis a été rejeté. Que dois-je faire ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Ouvrez le devis concerné et lisez le commentaire de l'équipe ARS. Il vous indique la raison du rejet et les démarches à suivre. Si nécessaire, corrigez vos documents ou créez une nouvelle simulation.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Je ne peux pas acheter un devis validé.
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Cela se produit généralement parce qu'un autre devis issu de la même simulation a déjà été transformé en contrat. Un seul devis par simulation peut aboutir à un contrat.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Pourquoi la date du jour n'est-elle pas disponible ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Après une certaine heure (généralement 16h00) ou le week-end, la date du jour peut être bloquée selon les règles de la compagnie. La plateforme vous propose automatiquement la première date disponible.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Mes documents sont-ils réutilisables pour plusieurs demandes ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Oui. Vos documents sont rattachés à votre compte et disponibles pour toutes vos futures demandes, tant qu'ils restent valides et à jour.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Que se passe-t-il si mon paiement est annulé ou interrompu ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Aucun montant n'est débité tant que le paiement n'est pas confirmé. Vous pouvez revenir à votre devis validé et recommencer le processus à tout moment.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Puis-je modifier une simulation après avoir généré un devis ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Une simulation déjà soumise ne peut plus être modifiée directement. Vous devrez créer une nouvelle simulation avec les informations corrigées.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Comment bénéficier des conventions de mon organisation ?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Vous devez avoir renseigné le code organisation et la clé d'accès lors de votre inscription. Si vous ne l'avez pas fait, contactez votre gestionnaire ARS pour régulariser votre situation.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="content-footer">
+      <div>
+        <div class="footer-logo">
+          <img src="logo/Image1.png"
+               onerror="this.style.display='none';"
+               alt="ARS" class="footer-logo-img">
+          <div class="footer-text">ARS<span>.</span>Auto — Guide Utilisateur</div>
+        </div>
+        <div class="footer-meta">Version 1.0 · 2025 · ARS Courtage &amp; Assurance</div>
+        <div class="footer-meta" style="font-size: 8px;">
+        Version 1.0 · 2025 · Développé par Khiari Mohamed
+        </div>
+
+      </div>
+      <a href="#" onclick="downloadGuide(event)" class="btn-red" style="font-size:13px;padding:10px 20px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger le guide
+      </a>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // Progress bar
+  const bar = document.getElementById('progress');
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    bar.style.width = Math.min(pct, 100) + '%';
+  }, { passive: true });
+
+  // Intersection Observer for fade-in
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.04, rootMargin: '0px 0px -40px 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // Sidebar active nav tracking
+  const sectionIds = ['introduction','acces','dashboard','simulation','couverture','devis','documents','soumission','achat','contrats','notifications','bonnes-pratiques','faq'];
+  const navItems = document.querySelectorAll('.nav-item');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 140) current = id;
+    });
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      const onclick = item.getAttribute('onclick') || '';
+      if (onclick.includes("'" + current + "'")) item.classList.add('active');
+    });
+  }, { passive: true });
+
+  // Nav scroll
+  function navTo(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Close mobile sidebar if open
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+    }
+  }
+
+  // Mobile sidebar
+  function toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const isOpen = sidebar.classList.toggle('open');
+    overlay.classList.toggle('open', isOpen);
+  }
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // Download guide function
+  function downloadGuide(event) {
+    event.preventDefault();
+    const link = document.createElement('a');
+    link.href = 'GUIDE_UTILISATEUR_ARS.docx';
+    link.download = 'GUIDE_UTILISATEUR_ARS.docx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Close mobile sidebar helper
+  function closeMobileSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  }
+</script>
+</body>
+</html>
