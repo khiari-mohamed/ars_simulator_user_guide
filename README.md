@@ -4,7 +4,7 @@ Guide utilisateur interactif pour le simulateur de tarification automobile d'ARS
 
 ## 🚀 Démo en ligne
 
-Visitez le guide : [https://votre-username.github.io/ars_guide](https://votre-username.github.io/ars_guide)
+Visitez le guide : [https://khiari-mohamed.github.io/ars_simulator_user_guide/guide-ARS.html](https://khiari-mohamed.github.io/ars_simulator_user_guide/guide-ARS.html)
 
 ## 📋 Description
 
@@ -42,7 +42,7 @@ ars_guide/
    - Branch : main / root
    - Cliquez sur Save
 
-Le site sera disponible à : `https://votre-username.github.io/ars_guide/guide-ARS.html`
+Le site sera disponible à : `https://khiari-mohamed.github.io/ars_simulator_user_guide/guide-ARS.html`
 
 ## 💻 Développement local
 
